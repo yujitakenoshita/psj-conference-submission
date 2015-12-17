@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>参加申込フォーム</title>
+<style type="text/css"><!--
+  table {
+  table-layout: auto;
+  border-style: solid;
+  }
+  th {
+  background-color: green;
+  color: white;
+  }
+--></style>
+</head>
+<body>
+  <h1>第XX回日本霊長類学会大会参加申込ページ</h1>
+
+  <p>サンプルなので項目の内容や設定は適当です。表のレイアウトも適当です。</p>
+
+  <p>第XX回日本霊長類学会大会に参加する方は、以下のフォームからお申込みください。
+    *は必須項目です。</p>
+  
+  <form action="/cgi-bin/send-participate.rb" method="get">
+    <!--
+	記入事項：
+	必須項目：性 (lname) text
+                  名 (fname) text
+                  メアド (email) text
+                  メアド確認用 (email2) text
+                  電話番号 (tel) text
+                  所属 (affil) text
+                  会員かどうか (mship) radio
+                  一般・学生等の別 (status) radio
+        自由項目：懇親会に参加するか (banquet) check
+                  託児を利用するか (takuji) check
+                  託児人数 (takuji-n) text
+		  特記事項 (request) textarea
+	-->
+  <table>
+    <tr><th>お名前*</th><td>姓：<input type="text" name="lname" value="" /> 名：
+	<input type="text" name="fname" value="" /></td></tr>
+    <tr><th>所属*</th><td><input type="text" size="40" name="affil" value=""
+				   /></td></tr>
+    <tr><th>E-Mail*</th><td><input type="text" size="30" name="email" value=""
+				   /></td></tr>
+    <tr><th>E-Mail*</th><td><input type="text" size="30" name="email2" value="" />
+	(確認のため再度入力してください。)</td></tr>
+    <tr><th>電話番号*</th><td><input type="text" size="12" name="tel" value="" />
+	(日中連絡のとれる番号を入力してください。ハイフン不要。)</td></tr>
+    <tr><th>会員種別*</th>
+      <td><input type="radio" name="kaiin" value="会員" /> 会員
+	<input type="radio" name="kaiin" value="非会員" /> 会員ではない</td></tr>
+    <tr><th>身分*</th>
+      <td><input type="radio" name="status" value="一般" /> 一般
+	<input type="radio" name="status" value="大学院生" /> 大学院生
+	<input type="radio" name="status" value="大学生・高校生" /> 大学生・高校生</td></tr>
+    <tr><th>懇親会</th>
+      <td><input type="checkbox" name="banquet" value="参加する" />
+	懇親会に参加する</td></tr>
+    <tr><th>託児</th>
+      <td><input type="checkbox" name="takuji" value="利用する" /> 利用する
+	 (お子さんの人数：
+	<input type="text" size="2" name="takuji-n" value="" />人)</td></tr>
+    <tr><th>特記事項</th>
+      <td>問い合わせ事項、要望などありましたらここにご記入ください。<br />
+	託児を利用する方は、お子さんの年齢や連絡事項をご記入ください。<br />
+	<textarea name="request" cols=50 rows=2></textarea></td></tr>
+  </table>
+  <input type="submit" name="kakunin" value="送信する" />
+  <input type="reset" name="kakunin" value="内容をすべて消去する" />
+  </form>
+</body>
+</html>
