@@ -3,7 +3,6 @@
 print "Content-Type: text/html\n\n"
 
 require 'cgi'
-
 cgi = CGI.new
 
 print <<EOM
@@ -23,6 +22,56 @@ print <<EOM
   </div>
   <div id="main">
   <hr />
+EOM
+
+banquet = cgi["banquet"]
+#cgi.delete("banquet")
+
+error = 0
+message = ""
+
+
+if cgi["email"] != cgi["email2"]
+  error = 1
+  message = "Eメールアドレスが確認用と一致しません。<br />"
+end
+if cgi["lname"] == ""
+  error = 1
+  message = message + "姓が未入力です。<br />"
+end
+if cgi["fname"] == ""
+  error = 1
+  message = message + "名が未入力です。<br />"
+end
+if cgi["lname-en"] == ""
+  error = 1
+  message = message + "Last name が未入力です。<br />"
+end
+if cgi["fname-en"] == ""
+  error = 1
+  message = message + "First nameが未入力です。<br />"
+end
+if cgi["affil"] == ""
+  error = 1
+  message = message + "所属が未入力です。<br />"
+end
+if cgi["email"] == ""
+  error = 1
+  message = message + "E-Mailがが未入力です。<br />"
+end
+if cgi["email2"] == ""
+  error = 1
+  message = message + "E-Mail(確認用)が未入力です。<br />"
+end
+if cgi["status"] == ""
+  error = 1
+  message = message + "会員種別がチェックされていません。<br />"
+end
+        
+
+if error == 0
+
+print <<EOM
   <h1>参加情報の確認</h1>
   <p>下記の内容で参加申込を行ないますか？
      入力内容をご確認のうえ、誤りがなければ「上記の内容で申込む」を、修正事項があれば「修正する」をクリックしてください。</p>
@@ -37,11 +86,11 @@ print <<EOM
 <tr><th>会員種別</th></tr>
 <tr><td>#{cgi["status"]}</td></tr>
 <tr><th>懇親会</th></tr>
-<tr><td>#{cgi["banquet"]}</td></tr>
+<tr><td>#{banquet}</td></tr>
 </table>
 EOM
 
-form_text = <<EOM
+  form_text = <<EOM
    <input type="hidden" name="lname" value="#{cgi["lname"]}" />
    <input type="hidden" name="fname" value="#{cgi["fname"]}" />
    <input type="hidden" name="lname-en" value="#{cgi["lname-en"]}" />
@@ -49,10 +98,10 @@ form_text = <<EOM
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
    <input type="hidden" name="email" value="#{cgi["email"]}" />
    <input type="hidden" name="status" value="#{cgi["status"]}" />
-   <input type="hidden" name="banquet" value="#{cgi["banquet"]}" />
+   <input type="hidden" name="banquet" value="#{banquet}" />
 EOM
 
-print <<EOM
+  print <<EOM
 <form action="./submit.rb" method="post" style="display: inline">
   #{form_text}
   <input type="submit" name="kakunin" value="上記の内容で申込む" />
@@ -61,8 +110,77 @@ print <<EOM
   #{form_text}
   <input type="submit" name="kakunin" value="修正する" />
 </form>
+EOM
+
+else
+  if cgi["status"] == "一般"
+    full = "checked"
+    student = ""
+  elsif cgi["status"] == "学生"
+    full = ""
+    full = "checked"
+  end
+  
+  if banquet == "参加する"
+    banquet = "checked"
+  else
+    banquet = ""
+  end
+  
+  print <<EOM
+      <h1>参加申込フォーム</h1>
+
+      <p><span style="color: red">入力内容に誤りがあります!</span> <br />
+        ご記入いただいた内容を再確認してください。<br />
+        <span style="color: red">#{message}</span></p>
+
+      <hr />
+     <form action="./confirm.rb" method="post">
+       <h2>お名前 Name</h2>
+       <table>
+ 	<tr><th></th><th>姓</th><th>名</th><th></th><th>Last Name</th><th>First and middle name</th></tr>
+ 	<tr>
+ 	  <td>和文</td>
+ 	  <td><input type="text" name="lname" value="#{cgi["lname"]}" size="15"/></td>
+ 	  <td><input type="text" name="fname" value="#{cgi["fname"]}"  size="15" /></td>
+ 	  <td>欧文</td>
+ 	  <td><input type="text" name="lname-en" value="#{cgi["lname-en"]}"  size="20"/></td>
+ 	  <td><input type="text" name="fname-en" value="#{cgi["fname-en"]}" size="20" /></td>
+ 	</tr>
+ 	<tr>
+ 	  <td></td><td></td><td></td><td></td>
+ 	  <td class="ex">ex) Mozart</td><td class="ex">ex) Wolfgang A.</td>
+ 	</tr>
+       </table>
+   
+       <h2>ご所属 Affiliation</h2>
+       <table>
+ 	<tr><td><input type="text" name="affil" value="#{cgi["affil"]}" size="90" /></td></tr>
+ 	<tr><td class="ex">例) 鹿児島大・理; 京都大・霊長研; Faculty of Sciences, Kagoshima Univ.; Primate Research Institute, Kyoto Univ.</td></tr>
+       </table>
+       <h2>電子メール E-Mail</h2>
+       <table>
+ 	<tr><td><input type="text" name="email" value="#{cgi["email"]}" size="50" /></td></tr>
+ 	<tr><td><input type="text" name="email2" value="#{cgi["email2"]}" size="50" />(確認用 Confirmation)</td></tr>
+      </table>
+       <h2>会員種別 Membership</h2>
+       <table>
+ 	<tr><td><input type="radio" name="status" value="一般" #{full} />一般 Full
+ 	    <input type="radio" name="status" value="学生" #{student} />学生 Student</td></tr>  
+       </table>
+       <h2>懇親会 Banquet</h2>
+       <table>
+       <tr><td><input type="checkbox" name="banquet" value="参加する" #{banquet} />参加する Attend</td></tr>
+    </table>
+     <p style="text-align: center;"><input type="submit" name="kakunin" value="確認画面へ進む" /></p>
+   </form>
+EOM
+  
+end
+ 
+ 
+print <<EOM
 </div>
 </body>
 </html>
-
 EOM

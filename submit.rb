@@ -16,18 +16,28 @@ input = <<EOM
 懇親会: #{cgi["banquet"]}
 EOM
 
+csvline = "#{cgi["lname"]},#{cgi["fname"]},#{cgi["lname-en"]},#{cgi["fname-en"]},#{cgi["email"]},#{cgi["status"]},#{cgi["banquet"]}"
+
 submit = Mail.new(:charset => 'ISO-2022-JP')
 submit.from = "#{cgi["email"]}" 
-submit.to = "registration@gmail.com" 
+submit.to = "info@psj32.com" 
 submit.subject = "参加申込 #{cgi["lname"]} #{cgi["fname"]}" 
 submit.body = <<EOM
  以下の内容で第32回日本霊長類学会に参加申込します。
 *** 
 #{input}
 ***
+
+---事務局使用欄---
+#{csvline}
+------------------
 EOM
 
 submit.deliver
+
+subscribeurl = <<EOM
+http://www.psj32.com/~takenoshita/correction-contribute.rb?lname=#{cgi["lname"]}&fname=#{cgi["fname"]}&lname-en=#{cgi["lname-en"]}&fname-en=#{cgi["fname-en"]}&affil=#{cgi["affil"]}&email=#{cgi["email"]}
+EOM
 
 subscriber = Mail.new(:charset => 'ISO-2022-JP')
 subscriber.from = "第32回日本霊長類学会大会事務局 <info@psj32.com>" 
@@ -44,6 +54,11 @@ subscriber.body = <<EOM
 #{input}
 
 お申込み内容に修正がありましたら、info@psj32.com へご連絡ください。
+
+発表申込をされる方は、以下のURLから申込みしてください。
+
+#{subscribeurl}
+
 当日、#{cgi["lname"]}様にお会いできますことを楽しみにしております。
 
 ---
@@ -74,8 +89,9 @@ print <<EOM
   <hr />
   <h1>参加申込完了</h1>
   <p>下記の内容で参加申込が完了しました。
-     ご登録のアドレスに確認メールをお送りしました。
-     発表申込みをされる方は、「続けて発表申込みをする」ボタンをクリックしてください。</p>
+     ご登録のアドレスに確認メールをお送りしました。<br />
+     発表申込みをされる方は、「続けて発表申込みをする」ボタンをクリックしてください。<br />
+     あとで発表申込みをされる方は、確認メールに記載の発表申込み用URLからお申込みください。</p>
   <hr />
 <table>
 <tr><th>お名前</th></tr>
@@ -90,14 +106,14 @@ print <<EOM
 <tr><td>#{cgi["banquet"]}</td></tr>
 </table>
 
-<form action="./correction-contribute.rb" method="post">
+<form action="./correction-contribute.rb" method="get">
    <input type="hidden" name="lname" value="#{cgi["lname"]}" />
    <input type="hidden" name="fname" value="#{cgi["fname"]}" />
    <input type="hidden" name="lname-en" value="#{cgi["lname-en"]}" />
    <input type="hidden" name="fname-en" value="#{cgi["fname-en"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
    <input type="hidden" name="email" value="#{cgi["email"]}" />
-  <input type="submit" name="kakunin" value="続けて発表申込みをする" />
+  <input type="submit" name="kakunin" value="発表申込みをする" />
 <input type="button" value="トップページに戻る" onClick="window.open('http://www.psj32.com/')">
 
 </div>

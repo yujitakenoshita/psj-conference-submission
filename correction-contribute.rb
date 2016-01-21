@@ -76,7 +76,6 @@ print <<EOM
       <h2>電子メール E-Mail</h2>
       <table>
 	<tr><td><input type="text" name="email" value="#{cgi["email"]}" size="50" /></td></tr>
-	<tr><td><input type="text" name="email2" value="#{cgi["email"]}" size="50" />(確認用 Confirmation)</td></tr>
      </table>
 
      <h2>発表種別 Category</h2>
