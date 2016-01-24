@@ -14,6 +14,7 @@ print <<EOM
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link href="css/form.css" rel="stylesheet" type="text/css" />
+
 <title>第32回日本霊長類学会大会</title>
 </head>
 <body>
@@ -24,17 +25,14 @@ print <<EOM
   <div id="main">
 
     <hr />
-    <h1>発表申込み：要旨と共同発表者</h1>
-    <p>続いて、以下に発表要旨を記入して下さい。
-       共同発表者がいる場合は、共同発表者の氏名と所属(和文のみ)を記入してください。</p>
+    <h1>発表申込み：要旨と発表者</h1>
+    <p>以下に発表要旨と発表者の情報を記入して下さい。</p>
     <hr />
 EOM
 
 authorinfo = <<EOM
    <input type="hidden" name="lname" value="#{cgi["lname"]}" />
    <input type="hidden" name="fname" value="#{cgi["fname"]}" />
-   <input type="hidden" name="lname-en" value="#{cgi["lname-en"]}" />
-   <input type="hidden" name="fname-en" value="#{cgi["fname-en"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
    <input type="hidden" name="email" value="#{cgi["email"]}" />
    <input type="hidden" name="cat" value="#{cgi["cat"]}" />
@@ -48,13 +46,34 @@ print <<EOM
 <form action="./confirm-abstract.rb" method="post">
  #{authorinfo}
 <h2>発表要旨</h2>
-<p><textarea name="abstract" wrap="physical" cols=80 rows=11>#{cgi["abstract"]}</textarea></p>
+<p><span style="font-size: 80%">800字程度で要旨を入力してください。<br />
+Abstract should be less than about 350 words.<br />
+太字にしたい文字は &lt;b&gt;&lt/b&gt;で、イタリック体にしたい文字は&lt;i&gt;&lt/i&gt;で挟んでください。(例: &lt;b&gt;太字/Bold&lt/b&gt;; &lt;i&gt;イタリック/Italic&lt/i&gt;<br />
+If you want to use <b>bold</b> or <i>italic</i> text, enclose the text with  &lt;b&gt;&lt/b&gt; and  &lt;b&gt;&lt/b&gt;.<br />
+(example: &lt;b&gt;<b>太字/Bold</b>&lt/b&gt;; &lt;i&gt;<i>イタリック/Italic</i>&lt/i&gt;</p>
+
+<p><textarea name="abstract" wrap="virtual" cols=82 rows=20>#{cgi["abstract"]}</textarea></p>
+
+EOM
+
+print <<EOM
+<h2>発表者</h2>
+<p>発表者の情報を以下に入力してください。<br />
+和文のお名前は、姓と名のあいだに半角スペースを入れてください。(例) 西郷 隆盛<br />
+欧文のお名前は、姓を先に、名をうしろに記してください。姓はすべて大文字にしてください。(例) MOZART Wolfgang A <br />
+For English name, last name should be capitalized and placed first. (ex) MOZART Wolfgang A</p>
+<fieldset>
+<legend>筆頭発表者</legend>
+<p><span style="font-size: 60%">氏名 (和文/Japanese)</span><input type="text" name="author1" value="#{cgi["author1"]}" size="25"> 
+   <span style="font-size: 60%">例) 西郷 隆盛; MOZART Worfgang A</span><br />
+<span style="font-size: 60%;">　　　　 (欧文/English)</span><input type="text" name="author-en1" value="#{cgi["author-en1"]}" size="40"> <span style="font-size: 60%"> ex) SAIGO Takamori; MOZART Wolfgang A</span><br />
+<span style="font-size: 60%; color: red">Please fill both Japanese and English fields.</span>
+<p><span style="font-size: 60%">所属　　</span><input type="text" name="affil1" value="#{cgi["affil1"]}" size="60"></p>
+</fieldset>
 EOM
 
 
 if cgi["co-author"].to_i >= 2 then
-    print "<h2>共同発表者</h2>\n"
-    print "<p>申込者以外の共同発表者の情報を以下に入力してください。</p>\n"
     num = 1
     vauthor = ""
     vauthen = ""
@@ -67,8 +86,9 @@ if cgi["co-author"].to_i >= 2 then
       print <<EOM
 <fieldset>\n
 <legend>第#{num}発表者</legend>\n
-<p><span style="font-size: 60%;">氏名 (和文)</span><input type="text" name="author#{num}" value="#{vauthor}" size="20"/> <span style="font-size: 60%">例)犬山太郎</span><br />
-<span style="font-size: 60%;">　　 (欧文)</span><input type="text" name="author-en#{num}" value="#{vauthen}" size="40" /> <span style="font-size: 60%"> ex) Walfgang A. Mozart</span></p>
+<p><span style="font-size: 60%;">氏名 (和文)</span><input type="text" name="author#{num}" value="#{vauthor}" size="20"/> <span style="font-size: 60%">例) 大久保 利通; HAYDN Franz J</span><br />
+<span style="font-size: 60%;">　　 (欧文)</span><input type="text" name="author-en#{num}" value="#{vauthen}" size="40" /> <span style="font-size: 60%"> ex) OHKUBO Toshimichi; HAYDN Franz J</span></p>
+<span style="font-size: 60%; color: red">Please fill both Japanese and English fields.</span>
 <p><span style="font-size: 60%">所属   　　</span><input type="text" name="affil#{num}" value="#{vaffil}" size="60"></p></fieldset>
 </fieldset>
 EOM

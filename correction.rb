@@ -50,18 +50,13 @@ print <<EOM
     <form action="./confirm.rb" method="post">
       <h2>お名前 Name</h2>
       <table>
-	<tr><th></th><th>姓</th><th>名</th><th></th><th>Last Name</th><th>First and middle name</th></tr>
+	<tr><th>姓 Last name</th><th>名 First & middle name</th></tr>
 	<tr>
-	  <td>和文</td>
-	  <td><input type="text" name="lname" value="#{cgi["lname"]}" size="15"/></td>
+	  <td><input type="text" name="lname" value="#{cgi["lname"]}" size="20"/></td>
 	  <td><input type="text" name="fname" value="#{cgi["fname"]}"  size="15" /></td>
-	  <td>欧文</td>
-	  <td><input type="text" name="lname-en" value="#{cgi["lname-en"]}"  size="20"/></td>
-	  <td><input type="text" name="fname-en" value="#{cgi["fname-en"]}" size="20" /></td>
 	</tr>
 	<tr>
-	  <td></td><td></td><td></td><td></td>
-	  <td class="ex">ex) Mozart</td><td class="ex">ex) Wolfgang A.</td>
+	  <td class="ex">ex) 西郷; MOZART</td><td class="ex">ex) 隆盛; Wolfgang A.</td>
 	</tr>
       </table>
       

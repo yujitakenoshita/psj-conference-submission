@@ -52,25 +52,20 @@ print <<EOM
 
      <h2>お名前 Name</h2>
       <table>
-	<tr><th></th><th>姓</th><th>名</th><th></th><th>Last Name</th><th>First and middle name</th></tr>
+	<tr><th>姓</th><th>名</th></tr>
 	<tr>
-	  <td>和文</td>
-	  <td><input type="text" name="lname" value="#{cgi["lname"]}" size="15"/></td>
-	  <td><input type="text" name="fname" value="#{cgi["fname"]}"  size="15" /></td>
-	  <td>欧文</td>
-	  <td><input type="text" name="lname-en" value="#{cgi["lname-en"]}"  size="20"/></td>
-	  <td><input type="text" name="fname-en" value="#{cgi["fname-en"]}" size="20" /></td>
+	  <td><input type="text" name="lname" value="#{cgi["lname"]}" size="20"/></td>
+	  <td><input type="text" name="fname" value="#{cgi["fname"]}"  size="20" /></td>
 	</tr>
 	<tr>
-	  <td></td><td></td><td></td><td></td>
-	  <td class="ex">ex) Mozart</td><td class="ex">ex) Wolfgang A.</td>
+	  <td class="ex">ex) 西郷; Mozart</td><td class="ex">ex) 隆盛; Wolfgang A.</td>
 	</tr>
       </table>
       
       <h2>ご所属 Affiliation</h2>
       <table>
 	<tr><td><input type="text" name="affil" value="#{cgi["affil"]}" size="90" /></td></tr>
-	<tr><td class="ex">例) 鹿児島大・理; 京都大・霊長研 | Faculty of Sciences, Kagoshima Univ.; Primate Research Institute, Kyoto Univ.</td></tr>
+	<tr><td class="ex">例) 鹿児島大・理; 京都大・霊長研 Faculty of Sciences, Kagoshima Univ.; Primate Research Institute, Kyoto Univ.</td></tr>
       </table>
 
       <h2>電子メール E-Mail</h2>
@@ -93,7 +88,7 @@ print <<EOM
      <tr><td><input type="text" name="title-en" value="#{cgi["title-en"]}" size="100" /></td></tr>
      </table>
 
-     <h2>共同発表者の人数 Number of co-authors</h2>
+     <h2>発表者の人数 Number of co-authors</h2>
      <table>
 	<tr><td><select name="co-author">
 	    <option value="0" #{coauthor[0]}>(選択してください please select)</option>

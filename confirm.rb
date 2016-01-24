@@ -33,39 +33,31 @@ message = ""
 
 if cgi["email"] != cgi["email2"]
   error = 1
-  message = "Eメールアドレスが確認用と一致しません。<br />"
+  message = "Eメールアドレスが確認用と一致しません。Email address does not match.<br />"
 end
 if cgi["lname"] == ""
   error = 1
-  message = message + "姓が未入力です。<br />"
+  message = message + "姓が未入力です。Missing Last name.<br />"
 end
 if cgi["fname"] == ""
   error = 1
-  message = message + "名が未入力です。<br />"
-end
-if cgi["lname-en"] == ""
-  error = 1
-  message = message + "Last name が未入力です。<br />"
-end
-if cgi["fname-en"] == ""
-  error = 1
-  message = message + "First nameが未入力です。<br />"
+  message = message + "名が未入力です。 Missing First name.<br />"
 end
 if cgi["affil"] == ""
   error = 1
-  message = message + "所属が未入力です。<br />"
+  message = message + "所属が未入力です。 Missing affiliation.<br />"
 end
 if cgi["email"] == ""
   error = 1
-  message = message + "E-Mailがが未入力です。<br />"
+  message = message + "E-Mailがが未入力です。Missing E-Mail.<br />"
 end
 if cgi["email2"] == ""
   error = 1
-  message = message + "E-Mail(確認用)が未入力です。<br />"
+  message = message + "E-Mail(確認用)が未入力です。Missing E-Mail confirmation<br />"
 end
 if cgi["status"] == ""
   error = 1
-  message = message + "会員種別がチェックされていません。<br />"
+  message = message + "会員種別がチェックされていません。 Membership not selected.<br />"
 end
         
 
@@ -78,7 +70,7 @@ print <<EOM
   <hr />
 <table>
 <tr><th>お名前</th></tr>
-<tr><td>#{cgi["lname"]} #{cgi["fname"]} / #{cgi["lname-en"]} #{cgi["fname-en"]}</td></tr>
+<tr><td>#{cgi["lname"]} #{cgi["fname"]}</td></tr>
 <tr><th>ご所属</th></tr>
 <tr><td>#{cgi["affil"]}</td></tr>
 <tr><th>電子メール</th></tr>
@@ -93,8 +85,6 @@ EOM
   form_text = <<EOM
    <input type="hidden" name="lname" value="#{cgi["lname"]}" />
    <input type="hidden" name="fname" value="#{cgi["fname"]}" />
-   <input type="hidden" name="lname-en" value="#{cgi["lname-en"]}" />
-   <input type="hidden" name="fname-en" value="#{cgi["fname-en"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
    <input type="hidden" name="email" value="#{cgi["email"]}" />
    <input type="hidden" name="status" value="#{cgi["status"]}" />
@@ -138,18 +128,13 @@ else
      <form action="./confirm.rb" method="post">
        <h2>お名前 Name</h2>
        <table>
- 	<tr><th></th><th>姓</th><th>名</th><th></th><th>Last Name</th><th>First and middle name</th></tr>
+ 	<tr><th>姓 Last name</th><th>名 First & middle name</th></tr>
  	<tr>
- 	  <td>和文</td>
- 	  <td><input type="text" name="lname" value="#{cgi["lname"]}" size="15"/></td>
- 	  <td><input type="text" name="fname" value="#{cgi["fname"]}"  size="15" /></td>
- 	  <td>欧文</td>
- 	  <td><input type="text" name="lname-en" value="#{cgi["lname-en"]}"  size="20"/></td>
- 	  <td><input type="text" name="fname-en" value="#{cgi["fname-en"]}" size="20" /></td>
+ 	  <td><input type="text" name="lname" value="#{cgi["lname"]}" size="20"/></td>
+ 	  <td><input type="text" name="fname" value="#{cgi["fname"]}"  size="20" /></td>
  	</tr>
  	<tr>
- 	  <td></td><td></td><td></td><td></td>
- 	  <td class="ex">ex) Mozart</td><td class="ex">ex) Wolfgang A.</td>
+  	  <td class="ex">ex) 西郷; MOZART</td><td class="ex">ex) 隆盛; Wolfgang A.</td>
  	</tr>
        </table>
    
