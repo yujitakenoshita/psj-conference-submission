@@ -106,7 +106,7 @@ print <<EOM
 <tr><td>#{cgi["banquet"]}</td></tr>
 </table>
 
-<form action="./correction-contribute.rb" method="get">
+<form action="./contribution.rb" method="get">
    <input type="hidden" name="lname" value="#{cgi["lname"]}" />
    <input type="hidden" name="fname" value="#{cgi["fname"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />

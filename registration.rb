@@ -47,7 +47,7 @@ if cgi["call"] == 'confirm' then
     message = message + "会員種別がチェックされていません。 Membership not selected.<br />"
   end
 else
-  select = "input"
+  select = 'input'
 end
 
 
@@ -152,11 +152,11 @@ EOM
 # 確認画面のボタン：申請か修正か
 reg_button <<EOM
 <form action="./submit.rb" method="post" style="display: inline">
-  #{form_text}
+  #{reg_hidden_form}
   <input type="submit" name="kakunin" value="上記の内容で申込む" />
 </form>
 <form action="./registration.rb" method="post" style="display: inline">
-  #{form_text}
+  #{reg_hidden_form}
   <input type="submit" name="kakunin" value="修正する" />
 </form>
 EOM
@@ -179,7 +179,6 @@ when 'error' then
   print reg_input_form
 when 'confirm' then
   print reg_confirm
-  print reg_hidden_form
   print reg_button
 else
   print '<p>原因不明のエラーが発生しました。<br />\n' +

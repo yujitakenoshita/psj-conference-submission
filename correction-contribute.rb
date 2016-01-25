@@ -23,32 +23,12 @@ else
 end
   
 
-print <<EOM
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <link href="css/form.css" rel="stylesheet" type="text/css" />
-<title>第32回日本霊長類学会大会</title>
-</head>
-<body>
-  <div id="header">
-    <h1 id="title">第32回日本霊長類学会大会</h1>
-    <h2 id="date">2016年7月15日〜17日　鹿児島大学郡元キャンパス</h2>
-  </div>
-  <div id="main">
+# 発表申込フォームのヘッド部分
+con_head =  File.read('contribute-head-html')
 
-    <hr />
-    <h1>発表申込フォーム</h1>
-
-    <p>発表予定の方は、下記のフォームからお申込みください。</p>
-
-    <hr />
-    
-
-  <form action="./confirm-contribute.rb" method="post">
+# 発表申込のフォーム部分
+con_input_form =  <<EOM
+      <form action="./confirm-contribute.rb" method="post">
 
      <h2>お名前 Name</h2>
       <table>
@@ -104,15 +84,22 @@ print <<EOM
 	    <option value="10" #{coauthor[10]}>10</option></select>人</td></tr>
      </table>
 
-     <h2>優秀発表賞 Student Award</h2>
+     <h2>優秀発表賞 Presentation Award</h2>
      <table>
 	<tr><td><input type="checkbox" name="award" value="申込む" #{award} />申込む Entry</td></tr>
      </table>
 
     <p style="text-align: center"><input type="submit" name="kakunin" value="確認画面へ進む" /></p>
   </form>
-</div>
-</body>
-</html>
-
 EOM
+
+###################################
+###  プログラム本体             ###
+###################################
+
+# 共通ヘッドの読みこみ
+print File.read('common-head.html')
+
+
+# 共通フッタの読みこみ
+print File.read('common-foot.html')
