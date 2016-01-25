@@ -67,7 +67,7 @@ else
 end
 
 # 入力・修正画面のヘッダ
-reg_head = File.read('registration-head.html')
+reg_head = File.read('head-registration.html')
 
 # 入力・修正画面のエラーメッセージ
 reg_error_messages =
@@ -166,7 +166,7 @@ EOM
 ###################################
 
 # 共通ヘッダ部分を出力
-print File.read('common-head.html')
+print File.read('head-common.html')
 
 # selectの値によって、初期入力画面/エラー画面/確認画面を出力
 case select
@@ -188,5 +188,5 @@ else
 end
 
 # 共通フッタ部分を出力
-print File.read('common-foot.html')
+print File.read('foot-common.html')
 
