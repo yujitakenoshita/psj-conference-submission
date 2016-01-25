@@ -49,10 +49,10 @@ htmlsource = <<EOM
 <hr />
 
 <div id="abstract">
-  <p id="abst-title" style="font-family: sans-serif">#{cgi["title"]}</p>
-  <p id="abst-title-e" style="font-family: sans-serif">#{cgi["title-en"]}</p>
-  <p id="abst-authors">#{cgi["authors"]}
-  <p id="abst-authors-e">#{cgi["authors-en"]}</p>
+  <h1 id="abst-title" style="font-family: sans-serif">#{cgi["title"]}</h1>
+  <h1 id="abst-title-e" style="font-family: sans-serif">#{cgi["title-en"]}</h1>
+  <h2 id="abst-authors">#{cgi["authors"]}</h2>
+  <h2 id="abst-authors-e">#{cgi["authors-en"]}</h2>
   <p id="abstract">#{cgi["abstract"]}</p>
 </div>
 </body>
