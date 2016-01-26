@@ -1,86 +1,96 @@
 #!/usr/bin/ruby
 # coding: utf-8
-print "Content-Type: text/html\n\n"
 
-require 'cgi'
-cgi = CGI.new
-
-# 入力・修正画面の「確認」ボタンから呼びだされた場合
-# select に confirm をセットしたのち、
-# 入力ミスを確認し、エラーがあれば select を error に変更
-# それ以外の場合、すなわち、最初の入力が「修正」ボタンから呼びだされた場合
-# select に input をセット
-# select が confirm か input か error かによって挙動を変える
-if cgi["call"] == 'confirm' then
-  select = 'conferm'
-  if cgi["lname"] == ""
-    select = 'confirm'
-    message = message + "姓が未入力です。Missing Last name.<br />"
-  end
-  if cgi["fname"] == ""
-    select = 'confirm'
-    message = message + "名が未入力です。 Missing First name.<br />"
-  end
-  if cgi["affil"] == ""
-    select = 'confirm'
-    message = message + "所属が未入力です。 Missing affiliation.<br />"
-  end
-  if cgi["email"] == ""
-    select = 'confirm'
-    message = message + "E-Mailが未入力です。Missing E-Mail.<br />"
-  end
-  if cgi["cat"] == ""
-    select = 'confirm'
-    message = message + "発表形式を選択してください。Please select category.<br />"
-  end
-  if cgi["title"] == ""
-    select = 'confirm'
-    message = message + "演題が未入力です。Missing title.<br />"
-  end
-  if cgi["title-en"] == ""
-    select = 'confirm'
-    message = message + "英文演題が未入力です。Missing English title.<br />"
-  end
-  if cgi["co-author"] == "0"
-    select = 'confirm'
-    message = message + "発表者数を選択してください。Please select number of author(s).<br />"
-  end
-else
-  select = 'input'
+def error_cgi
+  print "Content-Type:text/html\n\n"
+  print "*** CGI Error List ***<br />"
+  print "#{CGI.escapeHTML($!.inspect)}<br />"
+  $@.each {|x| print CGI.escapeHTML(x), "<br />"}
 end
 
-# 発表種別を確認
-cat = {"oral" => "", "poster" => ""}
-if cgi["cat"] == "口頭"
-  cat["oral"] = "checked"
-elsif cgi["cat"] == "ポスター"
-  cat["poster"] = "checked"
-end
+begin
+  print "Content-Type: text/html\n\n"
 
-# 発表者数の値を確認
-coauthor = Array.new(10)
-coauthor[cgi["co-author"].to_i] = "selected"
+  require 'cgi'
+  cgi = CGI.new
 
-# 発表賞申込を確認
-if cgi["award"] == "申込む"
-  award = "checked"
-else
-  award = ""
-end
-
-
-# 発表申込フォームのヘッド部分
-con_head =  File.read('head-contribution.html')
-
-# 入力・修正画面のエラーメッセージ
-con_error_messages =
-  "<p><span style='color: red'>入力内容に誤りがあります!</span> <br />\n" +
-  "ご記入いただいた内容を再確認してください。<br />\n" +
-  "<span style='color: red'>#{message}</span></p>\n"
-
-
-# 発表申込のフォーム部分
-con_input_form =  <<EOM
+  # 入力・修正画面の「確認」ボタンから呼びだされた場合
+  # select に confirm をセットしたのち、
+  # 入力ミスを確認し、エラーがあれば select を error に変更
+  # それ以外の場合、すなわち、最初の入力が「修正」ボタンから呼びだされた場合
+  # select に input をセット
+  # select が confirm か input か error かによって挙動を変える
+  if cgi["call"] == 'confirm' then
+    select = 'confirm'
+    message = ""
+    if cgi["lname"] == ""
+      select = 'error'
+      message = message + "姓が未入力です。Missing Last name.<br />"
+    end
+    if cgi["fname"] == ""
+      select = 'error'
+      message = message + "名が未入力です。 Missing First name.<br />"
+    end
+    if cgi["affil"] == ""
+      select = 'error'
+      message = message + "所属が未入力です。 Missing affiliation.<br />"
+    end
+    if cgi["email"] == ""
+      select = 'error'
+      message = message + "E-Mailが未入力です。Missing E-Mail.<br />"
+    end
+    if cgi["cat"] == ""
+      select = 'error'
+      message = message + "発表形式を選択してください。Please select category.<br />"
+    end
+    if cgi["title"] == ""
+      select = 'error'
+      message = message + "演題が未入力です。Missing title.<br />"
+    end
+    if cgi["title-en"] == ""
+      select = 'error'
+      message = message + "英文演題が未入力です。Missing English title.<br />"
+    end
+    if cgi["co-author"] == "0"
+      select = 'error'
+      message = message + "発表者数を選択してください。Please select number of author(s).<br />"
+    end
+  else
+    select = 'input'
+  end
+  
+  # 発表種別を確認
+  cat = {"oral" => "", "poster" => ""}
+  if cgi["cat"] == "口頭"
+    cat["oral"] = "checked"
+  elsif cgi["cat"] == "ポスター"
+    cat["poster"] = "checked"
+  end
+  
+  # 発表者数の値を確認
+  coauthor = Array.new(10)
+  coauthor[cgi["co-author"].to_i] = "selected"
+  
+  # 発表賞申込を確認
+  if cgi["award"] == "申込む"
+    award = "checked"
+  else
+    award = ""
+  end
+  
+  
+  # 発表申込フォームのヘッド部分
+  con_head =  File.read('head-contribution.html')
+  
+  # 入力・修正画面のエラーメッセージ
+  con_error_messages =
+    "<p><span style='color: red'>入力内容に誤りがあります!</span> <br />\n" +
+    "ご記入いただいた内容を再確認してください。<br />\n" +
+    "<span style='color: red'>#{message}</span></p>\n"
+  
+  
+  # 発表申込のフォーム部分
+  con_input_form =  <<EOM
       <form action="./contribution.rb" method="post">
 
      <h2>お名前 Name</h2>
@@ -115,10 +125,11 @@ con_input_form =  <<EOM
  
      <h2>演題 Title</h2>
      <table>
-     <tr><th>和文</th></tr>
+     <tr><th>正式演題 Original Title</th></tr>
      <tr><td><input type="text" name="title" value="#{cgi["title"]}" size="100" /></td></tr>
-     <tr><th>Engligh</th></tr>
-     <tr><td><input type="text" name="title-en" value="#{cgi["title-en"]}" size="100" /></td></tr>
+     <tr><th>英文演題 Title in English </th></tr>
+     <tr><td><input type="text" name="title-en" value="#{cgi["title-en"]}" size="100" /><br />
+     <span style="color: red; font-size: 80%">正式演題が英文であっても入力してください。 Please fill even if the original title is in English.</span></td></tr>
      </table>
 
      <h2>発表者の人数 Number of co-authors</h2>
@@ -147,8 +158,25 @@ con_input_form =  <<EOM
   </form>
 EOM
 
-# 確認画面の hidden フォーム
-con_hidden_form = <<EOM
+  # 確認画面のhtmlソース
+  con_confirm = <<EOM
+  <h2>発表申込者、演題の確認</h2>
+
+<table>
+<tr><th>お名前</th><td>#{cgi["lname"]} #{cgi["fname"]}</td></tr>
+<tr><th>ご所属</th><td>#{cgi["affil"]}</td></tr>
+<tr><th>電子メール</th><td>#{cgi["email"]}</td></tr>
+<tr><th>発表種別</th><td>#{cgi["cat"]}</td></tr>
+<tr><th>演題</th><td>#{cgi["title"]}</td></tr>
+<tr><th>演題(欧文)</th><td>#{cgi["title-en"]}</td></tr>
+<tr><th>共同発表者数</th><td>#{cgi["co-author"]}人</td></tr>
+<tr><th>発表賞</th><td>#{cgi["award"]}</td></tr>
+</table>
+EOM
+
+  
+  # 確認画面の hidden フォーム
+  con_hidden_form = <<EOM
    <input type="hidden" name="lname" value="#{cgi["lname"]}" />
    <input type="hidden" name="fname" value="#{cgi["fname"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
@@ -159,9 +187,9 @@ con_hidden_form = <<EOM
    <input type="hidden" name="co-author" value="#{cgi["co-author"]}" />
    <input type="hidden" name="award" value="#{cgi["award"]}" />
 EOM
-
-# 確認画面のボタン
-con_button <<EOM
+  
+  # 確認画面のボタン
+  con_button = <<EOM
 <form action="./abstract.rb" method="post" style="display: inline">
   #{con_hidden_form}
   <input type="submit" name="kakunin" value="要旨と共同発表者の入力に進む" />
@@ -173,31 +201,35 @@ con_button <<EOM
 EOM
 
 
-############################
-###   プログラム本体     ###
-############################
+  ############################
+  ###   プログラム本体     ###
+  ############################
+  
+  # 共通ヘッダ部分を出力
+  print File.read('head-common.html')
 
-# 共通ヘッダ部分を出力
-print File.read('head-common.html')
+  # selectの値によって、初期入力画面/エラー画面/確認画面を出力
+  case select
+  when 'input' then
+    print con_head
+    print con_input_form
+  when 'error' then
+    print con_head
+    print con_error_messages
+    print con_input_form
+  when 'confirm' then
+    print con_confirm
+    print con_button
+  else
+    print "<p>原因不明のエラーが発生しました。Select: #{select}<br />\n" +
+          'おそれいりますが、もう一度最初の画面からやりなおしてください。</p>' +
+          '<p>We are sorry, an error occured during process. <br />' +
+          'Please return to url notified in the registration confirmation mail.</p>'
+  end
 
-# selectの値によって、初期入力画面/エラー画面/確認画面を出力
-case select
-when 'input' then
-  print con_head
-  print con_input_form
-when 'error' then
-  print con_head
-  print con_error_messages
-  print con_input_form
-when 'confirm' then
-  print con_confirm
-  print con_button
-else
-  print '<p>原因不明のエラーが発生しました。<br />\n' +
-        'おそれいりますが、もう一度最初の画面からやりなおしてください。</p>' +
-        '<p>We are sorry, an error occured during process. <br />' +
-        'Please return to url notified in the registration confirmation mail.</p>'
+  # 共通フッタ部分を出力
+  print File.read('foot-common.html')
+
+rescue
+  error_cgi
 end
-
-# 共通フッタ部分を出力
-print File.read('foot-common.html')

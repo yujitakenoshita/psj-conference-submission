@@ -1,12 +1,70 @@
 #!/usr/bin/ruby
 # coding: utf-8
-print "Content-Type: text/html\n\n"
 
-require 'cgi'
+def error_cgi
+  print "Content-Type:text/html\n\n"
+  print "*** CGI Error List ***<br />"
+  print "#{CGI.escapeHTML($!.inspect)}<br />"
+  $@.each {|x| print CGI.escapeHTML(x), "<br />"}
+end
 
-cgi = CGI.new
+begin
+  print "Content-Type: text/html\n\n"
 
-authorinfo = <<EOM
+  require 'cgi'
+  cgi = CGI.new
+
+  # 入力・修正画面の「確認」ボタンから呼びだされた場合
+  # select に confirm をセットしたのち、
+  # 入力ミスを確認し、エラーがあれば select を error に変更
+  # それ以外の場合、すなわち、最初の入力が「修正」ボタンから呼びだされた場合
+  # select に input をセット
+  # select が confirm か input か error かによって挙動を変える
+
+  # confirmの場合のエラーチェック
+  if cgi["call"] == 'confirm' then
+    select = 'confirm'
+    message = ""
+    # 要旨の文字数チェック
+    if cgi["abstract"].bytesize > 2550 then
+      select = 'error'
+      message = "要旨の文字数が多すぎます！ Your abstract is too long!"
+    end
+    # 発表者情報漏れのチェック
+    enum = 1
+    while enum <= cgi["co-author"].to_i do
+      if cgi["author" + enum.to_s] == "" then
+        select = 'error'
+        message = message + "<br />発表者情報に未入力の箇所があります。"
+        break
+      elsif cgi["author-en" + enum.to_s] == "" then
+        select = 'error'
+        message = message + "<br />発表者情報に未入力の箇所があります。"
+        break
+      elsif cgi["affil" + enum.to_s] == "" then
+        select = 'error'
+        message = message + "<br />発表者情報に未入力の箇所があります。"
+        break
+      else
+        enum = enum + 1
+      end
+    end      
+  else
+    select = 'input'
+  end
+
+  # 入力・修正画面のヘッダ
+  abst_head = File.read('head-abstract.html')
+
+  # 修正画面のエラーメッセージ
+  abst_error_messages = 
+    "<p><span style='color: red'>入力内容に不備があります!</span> <br />\n" +
+    "ご記入いただいた内容を再確認してください。<br />\n" +
+    "<span style='color: red'>#{message}</span></p>\n"
+
+  # 入力・修正画面のフォーム部分の部品
+  # Contributionからの引き継ぎ内容
+  authorinfo = <<EOM
    <input type="hidden" name="lname" value="#{cgi["lname"]}" />
    <input type="hidden" name="fname" value="#{cgi["fname"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
@@ -17,79 +75,187 @@ authorinfo = <<EOM
    <input type="hidden" name="co-author" value="#{cgi["co-author"]}" />
    <input type="hidden" name="award" value="#{cgi["award"]}" />
 EOM
-
-print <<EOM
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <link href="css/form.css" rel="stylesheet" type="text/css" />
-
-<title>第32回日本霊長類学会大会</title>
-</head>
-<body>
-  <div id="header">
-    <h1 id="title">第32回日本霊長類学会大会</h1>
-    <h2 id="date">2016年7月15日〜17日　鹿児島大学郡元キャンパス</h2>
-  </div>
-  <div id="main">
-
-    <hr />
-    <h1>発表申込み：要旨と発表者</h1>
-    <p>続いて、以下に発表要旨と発表者情報を記入して下さい。</p>
-    <hr />
-
-<form action="./confirm-abstract.rb" method="post">
- #{authorinfo}
-<h2>発表要旨 Abstract</h2>
-<p><span style="font-size: 80%">800字程度で要旨を入力してください
-Abstract should be less than about 350 words.<br />
-太字にしたい文字は &lt;b&gt;&lt/b&gt;で、イタリック体にしたい文字は&lt;i&gt;&lt/i&gt;で挟んでください。(例: &lt;b&gt;太字/Bold&lt/b&gt;; &lt;i&gt;イタリック/Italic&lt/i&gt;<br />
-If you want to use <b>bold</b> or <i>italic</i> text, enclose the text with  &lt;b&gt;&lt/b&gt; and  &lt;b&gt;&lt/b&gt;.<br />
-(example: &lt;b&gt;<b>太字/Bold</b>&lt/b&gt;; &lt;i&gt;<i>イタリック/Italic</i>&lt/i&gt;</p>
-<p><textarea name="abstract" wrap="virtual" cols=82 rows=20></textarea></p>
+  # 要旨のテキストエリアの部分
+  abstract_tarea = <<EOM
+   <h2>発表要旨 Abstract</h2>
+     <p><span style="font-size: 90%">800字程度で、途中で改行せず、ひとつの段落で要旨を入力してください。
+        改行しても無視されます。<br />
+        Abstract should be no more  than about 350 words in a single paragraph, without line break 
+        (Line breaks are ignored by the system). <br />
+        イタリック体にしたい文字は&lt;i&gt;&lt/i&gt;で挟んでください。<br />
+        If you want to use <i>italic</i> text, enclose the text with &lt;b&gt;&lt/b&gt;.<br />
+        (example: &lt;i&gt;<i>イタリック/Italic</i>&lt/i&gt;<br />
+     <p><textarea name="abstract" wrap="virtual" cols=82 rows=20>#{cgi["abstract"]}</textarea></p>
 EOM
-
-print <<EOM
-<h2>発表者</h2>
-<p>発表者の情報を以下に入力してください。<br />
-和文のお名前は、姓と名のあいだに半角スペースを入れてください。(例) 西郷 隆盛<br />
-欧文のお名前は、姓を先に、名をうしろに記してください。姓はすべて大文字にしてください。(例) MOZART Wolfgang A <br />
-For English name, last name should be capitalized and placed first. (ex) MOZART Wolfgang A</p>
-<fieldset>
-<legend>筆頭発表者</legend>
-<p><span style="font-size: 60%">氏名 (和文/Japanese)</span><input type="text" name="author1" value="#{cgi["lname"]} #{cgi["fname"]}" size="25"> 
-   <span style="font-size: 60%">例) 西郷 隆盛; MOZART Worfgang A</span><br />
-<span style="font-size: 60%;">　　　　 (欧文/English)</span><input type="text" name="author-en1" value="" size="40"> <span style="font-size: 60%"> ex) SAIGO Takamori; MOZART Wolfgang A</span><br />
-<span style="font-size: 60%; color: red">Please fill both Japanese and English fields.</span>
-<p><span style="font-size: 60%">所属　　</span><input type="text" name="affil1" value="#{cgi["affil"]}" size="60"></p>
-</fieldset>
+  # 発表者情報の部分
+  first_author = <<EOM
+    <h2>発表者</h2>
+    <p span style="font-size: 90%">発表者の情報を以下に入力してください。<br />
+    和文のお名前は、姓と名のあいだに半角スペースを入れてください。(例) 西郷 隆盛<br />
+    欧文のお名前は、姓を先に、名をうしろに記してください。姓はすべて大文字にしてください。
+    (例) MOZART Wolfgang A <br />
+    For English name, last name should be capitalized and placed first. (ex) MOZART Wolfgang A</p>
+    <fieldset>
+      <legend>筆頭発表者</legend>
+      <p><span style="font-size: 60%">氏名 (和文/Japanese)</span>
+           <input type="text" name="author1" value="#{cgi["lname"]} #{cgi["fname"]}" size="25"> 
+           <span style="font-size: 60%">例) 西郷 隆盛; MOZART Worfgang A</span><br />
+           <span style="font-size: 60%;">　　　　 (欧文/English)</span>
+           <input type="text" name="author-en1" value="#{cgi["author-en1"]}" size="40">
+           <span style="font-size: 60%"> ex) SAIGO Takamori; MOZART Wolfgang A</span><br />
+           <span style="font-size: 60%; color: red">Please fill both Japanese and English fields.</span>
+      <p><span style="font-size: 60%">所属　　</span>
+           <input type="text" name="affil1" value="#{cgi["affil"]}" size="60"></p>
+     </fieldset>
 EOM
-
-
-if cgi["co-author"].to_i >= 2 then
+  # 共同発表者の分を、人数に応じて生成する。
+  co_authors = ""
+  if cgi["co-author"].to_i >= 2 then
     num = 1
+    vauthor = ""
+    vauthen = ""
+    vaffil = ""
     while num < cgi["co-author"].to_i do
       num = num + 1
-      print <<EOM
-<fieldset>\n
-<legend>第#{num}発表者</legend>\n
-<p><span style="font-size: 60%;">氏名 Name (和文/Japanese)</span><input type="text" name="author#{num}" value="" size="20"> <span style="font-size: 60%">例)大久保 利通; HAYDN Franz J</span><br />
-<span style="font-size: 60%;">　　　　 (欧文/English)</span><input type="text" name="author-en#{num}" value="" size="40"> <span style="font-size: 60%"> ex) OHKUBO Toshimichi; HAYDN Franz J</span><br />
-<span style="font-size: 60%; color: red">Please fill both Japanese and English fields.</span>
-</p>
-<p><span style="font-size: 60%">所属   　　</span><input type="text" name="affil#{num}" value="" size="60"></p>
-</fieldset>
+      vauthor = cgi["author" + num.to_s]
+      vauthen = cgi["author-en" + num.to_s]
+      vaffil = cgi["affil" + num.to_s]
+      co_authors = co_authors +  <<EOM
+      <fieldset>
+        <legend>第#{num}発表者</legend>
+        <p><span style="font-size: 60%;">氏名 (和文)</span>
+           <input type="text" name="author#{num}" value="#{vauthor}" size="20"/>
+           <span style="font-size: 60%">例) 大久保 利通; HAYDN Franz J</span><br />
+           <span style="font-size: 60%;">　　 (欧文)</span>
+           <input type="text" name="author-en#{num}" value="#{vauthen}" size="40" />
+           <span style="font-size: 60%"> ex) OHKUBO Toshimichi; HAYDN Franz J</span><br />
+           <span style="font-size: 60%; color: red">Please fill both Japanese and English fields.</span></p>
+        <p><span style="font-size: 60%">所属   　　</span>
+           <input type="text" name="affil#{num}" value="#{vaffil}" size="60"></p>
+     </fieldset>
 EOM
     end
-end
-
-print <<EOM
-<p style="text-align: center"><input type="submit" name="kakunin" value="確認する" /></p>
-</form>
-</div>
-</body>
-</html>
+  end
+  
+  # 入力画面のフォーム部分 
+  abst_input_form = <<EOM
+  <form action="./abstract.rb" method="post">
+  #{authorinfo}
+  #{abstract_tarea}
+  #{first_author}
+  #{co_authors}
+  <input type="hidden" name="call" value="confirm" />
+  <p style="text-align: center"><input type="submit" name="kakunin" value="確認する" /></p>
+  </form>
 EOM
+
+  # 確認画面の部品
+  # 要旨テキスト
+  abst_text = cgi["abstract"]
+  # 著者情報
+  # 筆頭著者の名前をまず挿入
+  authors = cgi["author1"] + " (" + cgi["affil1"] + ")"
+  authorsEn = cgi["author-en1"]
+  authors_hidden = <<EOM
+  <input type="hidden" name="author1" value="#{cgi["author1"]}" />
+  <input type="hidden" name="affil1" value="#{cgi["affil1"]}" />
+  <input type="hidden" name="author-en1" value="#{cgi["author-en1"]}" />
+EOM
+  # 共同発表者の人数にあわせ、共同発表者の名前を追加
+  numauthors = cgi["co-author"].to_i
+  if numauthors > 1 then
+    num = 1
+    while num < numauthors do
+      num = num + 1
+      if cgi["author" + num.to_s] == ""
+        break
+      else
+        authors = authors + "，" + cgi["author" + num.to_s] + "（" + cgi["affil" + num.to_s] + "）"
+        authorsEn = authorsEn + ", " + cgi["author-en" + num.to_s]
+        authors_hidden = authors_hidden + <<EOM
+       <input type="hidden" name="author#{num.to_s}" value="#{cgi["author" + num.to_s]}" />
+       <input type="hidden" name="affil#{num.to_s}" value="#{cgi["affil" + num.to_s]}" />
+       <input type="hidden" name="author-en#{num.to_s}" value="#{cgi["author-en" + num.to_s]}" />
+EOM
+      end
+    end
+  end
+
+  abst_confirm = <<EOM
+   <h1>発表申込：すべての内容の最終確認</h1>
+   <p>以下の内容でよろしいでしょうか。</p>
+    <hr />
+
+   <h2>演題 Title</h2>
+     <table>
+       <tr><th>和文</th><td>#{cgi["title"]}</td></tr>
+       <tr><th>English Title</th><td>#{cgi["title-en"]}</td></tr>
+     </table>
+   <h2>発表者 Author(s)</h2>
+     <table>
+       <tr><th>和文</th><td>#{authors}</td></tr>
+       <tr><th>English</th><td>#{authorsEn}</td></tr>
+     </table>
+   <h2>要旨 Abstract</h2>
+     <p>　#{abst_text}</p>
+   <h2>発表種別 Category</h2>
+     <p>#{cgi["cat"]}</p>
+   <h2>発表賞 Presentation Award</h2>
+     <p>#{cgi["award"]}</p>
+EOM
+
+  # 確認画面の hidden フォーム
+  abst_hidden_form = <<EOM
+  #{authorinfo}
+   <input type="hidden" name="authors" value="#{authors}" />
+   <input type="hidden" name="authorsEn" value="#{authorsEn}" />
+   <input type="hidden" name="abstract" value="#{abst_text}" />
+  #{authors_hidden}
+EOM
+
+
+  # 確認画面のボタン：送信か修正か
+  abst_button = <<EOM
+   <form action="./send-abstract.rb" method="post" style="display: inline">
+      #{abst_hidden_form}
+      <input type="submit" name="kakunin" value="この内容で送信する" />
+   </form>
+   <form action="./abstract.rb" method="post" style="display: inline">
+      #{abst_hidden_form}
+      <input type="submit" name="kakunin" value="修正する" />
+   </form>
+EOM
+  
+  ###################################
+  ###   プログラム本体            ###
+  ###################################
+  
+  # 共通ヘッダ部分を出力
+  print File.read('head-common.html')
+  
+  # selectの値によって、初期入力画面/エラー画面/確認画面を出力
+  case select
+  when 'input' then
+    print abst_head
+    print abst_input_form
+  when 'error' then
+    print abst_head
+    print abst_error_messages
+    print abst_input_form
+  when 'confirm' then
+    print abst_confirm
+    print abst_button
+  else
+    print "<p>原因不明のエラーが発生しました。 Select: #{select}<br />\n" +
+          'おそれいりますが、もう一度最初の画面からやりなおしてください。</p>' +
+          '<p>We are sorry, an error occured during process. <br />' +
+          'Please return to registration page.</p>'
+  end
+  
+  # 共通フッタ部分を出力
+  print File.read('foot-common.html')
+
+ 
+rescue
+  error_cgi
+end

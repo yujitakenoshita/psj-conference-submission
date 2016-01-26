@@ -1,14 +1,24 @@
 #!/usr/bin/ruby
 # coding: utf-8
-print "Content-Type: text/html\n\n"
 
-require 'cgi'
-require 'mail'
-require 'mail-iso-2022-jp'
+def error_cgi
+  print "Content-Type:text/html\n\n"
+  print "*** CGI Error List ***<br />"
+  print "#{CGI.escapeHTML($!.inspect)}<br />"
+  $@.each {|x| print CGI.escapeHTML(x), "<br />"}
+end
 
-cgi = CGI.new
+begin
+  print "Content-Type: text/html\n\n"
 
-input = <<EOM
+  require 'url'
+  require 'cgi'
+  require 'mail'
+  require 'mail-iso-2022-jp'
+
+  cgi = CGI.new
+
+  input = <<EOM
 お名前: #{cgi["lname"]} #{cgi["fname"]}
 ご所属: #{cgi["affil"]}
 電子メール: #{cgi["email"]}
@@ -16,13 +26,13 @@ input = <<EOM
 懇親会: #{cgi["banquet"]}
 EOM
 
-csvline = "#{cgi["lname"]},#{cgi["fname"]},#{cgi["affil"]},#{cgi["email"]},#{cgi["status"]},#{cgi["banquet"]}"
+  csvline = "#{cgi["lname"]},#{cgi["fname"]},#{cgi["affil"]},#{cgi["email"]},#{cgi["status"]},#{cgi["banquet"]}"
 
-submit = Mail.new(:charset => 'ISO-2022-JP')
-submit.from = "#{cgi["email"]}" 
-submit.to = "info@psj32.com" 
-submit.subject = "参加申込 #{cgi["lname"]} #{cgi["fname"]}" 
-submit.body = <<EOM
+  submit = Mail.new(:charset => 'ISO-2022-JP')
+  submit.from = "#{cgi["email"]}" 
+  submit.to = "info@psj32.com" 
+  submit.subject = "[PSJ32] 参加申込 #{cgi["lname"]} #{cgi["fname"]}" 
+  submit.body = <<EOM
  以下の内容で第32回日本霊長類学会に参加申込します。
 *** 
 #{input}
@@ -32,18 +42,18 @@ submit.body = <<EOM
 #{csvline}
 ------------------
 EOM
-
-submit.deliver
-
-subscribeurl = <<EOM
-http://www.psj32.com/~takenoshita/correction-contribute.rb?lname=#{cgi["lname"]}&fname=#{cgi["fname"]}&affil=#{cgi["affil"]}&email=#{cgi["email"]}
+  
+  submit.deliver
+  
+  subscribeurl = <<EOM
+http://www.psj32.com/cgi-bin/contribution.rb?lname=#{cgi["lname"]}&fname=#{cgi["fname"]}&affil=#{cgi["affil"]}&email=#{cgi["email"]}
 EOM
-
-subscriber = Mail.new(:charset => 'ISO-2022-JP')
-subscriber.from = "第32回日本霊長類学会大会事務局 <info@psj32.com>" 
-subscriber.to = "#{cgi["lname"]} #{cgi["fname"]}様 <#{cgi["email"]}>" 
-subscriber.subject = "第32回日本霊長類学会大会 参加申込完了" 
-subscriber.body = <<EOM
+  
+  subscriber = Mail.new(:charset => 'ISO-2022-JP')
+  subscriber.from = "第32回日本霊長類学会大会事務局 <info@psj32.com>" 
+  subscriber.to = "#{cgi["lname"]} #{cgi["fname"]}様 <#{cgi["email"]}>" 
+  subscriber.subject = "第32回日本霊長類学会大会 参加申込完了" 
+  subscriber.body = <<EOM
  #{cgi["lname"]} #{cgi["fname"]}様
 
 # このメールはシステムからの自動送信メールです。
@@ -57,7 +67,7 @@ subscriber.body = <<EOM
 
 発表申込をされる方は、以下のURLから申込みしてください。
 
-#{subscribeurl}
+#{URI.escape(subscribeurl)}
 
 当日、#{cgi["lname"]}様にお会いできますことを楽しみにしております。
 
@@ -68,25 +78,11 @@ http://www.psj32.com
 
 EOM
 
-subscriber.deliver
-
-print <<EOM
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link href="css/form.css" rel="stylesheet" type="text/css" />
-<title>第32回日本霊長類学会大会</title>
-</head>
-<body>
-  <div id="header">
-    <h1 id="title">第32回日本霊長類学会大会</h1>
-    <h2 id="date">2016年7月15日〜17日　鹿児島大学郡元キャンパス</h2>
-  </div>
-  <div id="main">
-  <hr />
+  subscriber.deliver
+  
+  print File.read('head-common.html')
+  
+  print <<EOM
   <h1>参加申込完了</h1>
   <p>下記の内容で参加申込が完了しました。
      ご登録のアドレスに確認メールをお送りしました。<br />
@@ -113,8 +109,10 @@ print <<EOM
    <input type="hidden" name="email" value="#{cgi["email"]}" />
   <input type="submit" name="kakunin" value="発表申込みをする" />
 <input type="button" value="トップページに戻る" onClick="window.open('http://www.psj32.com/')">
-
-</div>
-</body>
-</html>
 EOM
+
+  print File.read('foot-common.html')
+
+rescue
+  error_cgi
+end

@@ -67,7 +67,7 @@ attach.close
 submit = Mail.new(:charset => 'ISO-2022-JP')
 submit.from = "#{cgi["lname"]} #{cgi["fname"]} <#{cgi["email"]}>" 
 submit.to = "registration@psj32.com" 
-submit.subject = "発表申込:#{ref}  #{cgi["lname"]} #{cgi["fname"]}様" 
+submit.subject = "[PSJ32:html]発表申込:#{ref}  #{cgi["lname"]} #{cgi["fname"]}様" 
 submit.body = <<EOM
 PSJ32 server received a new subscription of a paper.
 See the attachement for detail.
@@ -79,8 +79,9 @@ system("rm /tmp/form/#{ref}.html")
 
 subscriber = Mail.new(:charset => 'ISO-2022-JP')
 subscriber.from = "第32回日本霊長類学会大会事務局 <info@psj32.com>" 
-subscriber.to = "#{cgi["lname"]} #{cgi["fname"]}様 <#{cgi["email"]}>" 
-subscriber.subject = "第32回日本霊長類学会大会 発表申込完了" 
+subscriber.to = "#{cgi["lname"]} #{cgi["fname"]}様 <#{cgi["email"]}>"
+subscriber.cc = "registration@psj32.com" 
+subscriber.subject = "[PSJ32] 第32回日本霊長類学会大会 発表申込完了" 
 subscriber.body = <<EOM
  #{cgi["lname"]} #{cgi["fname"]}様
 
@@ -105,25 +106,9 @@ EOM
 
 subscriber.deliver
 
+print File.read('head-common.html')
 
 print <<EOM
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <link href="css/form.css" rel="stylesheet" type="text/css" />
-<title>第32回日本霊長類学会大会</title>
-</head>
-<body>
-  <div id="header">
-    <h1 id="title">第32回日本霊長類学会大会</h1>
-    <h2 id="date">2016年7月15日〜17日　鹿児島大学郡元キャンパス</h2>
-  </div>
-  <div id="main">
-
-    <hr />
     <h1>発表申込み完了</h1>
     <p>下記の内容で発表申込みが完了しました。<br />
        受付番号は <span style="font-style: bold; color: blue">#{ref}</span> です。<br />
@@ -151,14 +136,11 @@ print <<EOM
 <h2>要旨 Abstract</h2>
 <p>#{cgi["abstract"]}</p>
 
+<hr />
+<p><a href="http://www.psj32.com/">大会トップページに戻る</a></p>
 
 EOM
 
-print <<EOM
-<p><a href="http://www.psj32.com/">トップページに戻る</a></p>
-</div>
-</body>
-</html>
-EOM
+print File.read('foot-common.html')
 
 
