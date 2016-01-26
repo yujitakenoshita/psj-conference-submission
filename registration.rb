@@ -29,14 +29,9 @@ begin
       message = "Eメールアドレスが確認用と一致しません。Email address does not match.<br />"
     end
     if
-      cgi["lname"] == ""
+      cgi["name"] == ""
       select = 'error'
-      message = message + "姓が未入力です。Missing Last name.<br />"
-    end
-    if
-      cgi["fname"] == ""
-      select = 'error'
-      message = message + "名が未入力です。 Missing First name.<br />"
+      message = message + "お名前が未入力です。Missing your name.<br />"
     end
     if
       cgi["affil"] == ""
@@ -81,8 +76,8 @@ begin
   
   # 入力・修正画面のエラーメッセージ
   reg_error_messages =
-    "<p><span style='color: red'>入力内容に誤りがあります!</span> <br />\n" +
-    "ご記入いただいた内容を再確認してください。<br />\n" +
+    "<p><span style='color: red'>入力内容に不備があります! Invalid field(s).</span> <br />\n" +
+    "ご記入いただいた内容を再確認してください。Check input fields.<br />\n" +
     "<span style='color: red'>#{message}</span></p>\n"
   
   # 入力・修正画面のフォーム部分
@@ -91,20 +86,14 @@ begin
 <form action="./registration.rb" method="post">
   <h2>お名前 Name</h2>
   <table>
-    <tr><th>姓 Last name</th><th>名 First & middle name</th></tr>
-    <tr>
-      <td><input type="text" name="lname" value="#{cgi["lname"]}" size="20"/></td>
-      <td><input type="text" name="fname" value="#{cgi["fname"]}"  size="15" /></td>
-    </tr>
-    <tr>
-      <td class="ex">ex) 西郷; MOZART</td><td class="ex">ex) 隆盛; Wolfgang A.</td>
-    </tr>
+    <tr><td><input type="text" name="name" value="#{cgi["name"]}" size="20"/></td></tr>
+    <tr><td class="ex">example) 五代友厚; Worfgang A. MOZART</td></tr>
   </table>
   
   <h2>ご所属 Affiliation</h2>
   <table>
     <tr><td><input type="text" name="affil" value="#{cgi["affil"]}" size="90" /></td></tr>
-    <tr><td class="ex">例) 鹿児島大・理; 京都大・霊長研 | Faculty of Sciences, Kagoshima Univ.; Primate Research Institute, Kyoto Univ.</td></tr>
+    <tr><td class="ex">example) 鹿児島大・理; 京都大・霊長研; Fac. Sciences, Kagoshima Univ.; Primate Research Institut, Kyoto Univ.</td></tr>
   </table>
   
   <h2>電子メール E-Mail</h2>
@@ -132,27 +121,27 @@ EOM
   # 確認画面のhtmlソース
   reg_confirm = <<EOM
   <h1>参加情報の確認</h1>
-  <p>下記の内容で参加申込を行ないますか？
-     入力内容をご確認のうえ、誤りがなければ「上記の内容で申込む」を、修正事項があれば「修正する」をクリックしてください。</p>
+  <p>下記の内容で参加申込を行ないますか？ Are you sure to submit with following entries? <br />
+     入力内容をご確認のうえ、誤りがなければ「上記の内容で申込む」を、修正事項があれば「修正する」をクリックしてください。<br />
+     Check your entry and click "submit" or "modify".</p>
   <hr />
 <table>
-<tr><th>お名前</th></tr>
-<tr><td>#{cgi["lname"]} #{cgi["fname"]}</td></tr>
-<tr><th>ご所属</th></tr>
+<tr><th>お名前 Name</th></tr>
+<tr><td>#{cgi["name"]}</td></tr>
+<tr><th>ご所属 Affiliation</th></tr>
 <tr><td>#{cgi["affil"]}</td></tr>
-<tr><th>電子メール</th></tr>
+<tr><th>電子メール E-Mail</th></tr>
 <tr><td>#{cgi["email"]}</td></tr>
-<tr><th>会員種別</th></tr>
+<tr><th>会員種別 PSJ membership</th></tr>
 <tr><td>#{cgi["status"]}</td></tr>
-<tr><th>懇親会</th></tr>
+<tr><th>懇親会 Banquet</th></tr>
 <tr><td>#{banquet}</td></tr>
 </table>
 EOM
 
   # 確認画面の hiddenフォーム
   reg_hidden_form = <<EOM
-   <input type="hidden" name="lname" value="#{cgi["lname"]}" />
-   <input type="hidden" name="fname" value="#{cgi["fname"]}" />
+   <input type="hidden" name="name" value="#{cgi["name"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
    <input type="hidden" name="email" value="#{cgi["email"]}" />
    <input type="hidden" name="status" value="#{cgi["status"]}" />
@@ -163,11 +152,11 @@ EOM
   reg_button = <<EOM
 <form action="./submit.rb" method="post" style="display: inline">
   #{reg_hidden_form}
-  <input type="submit" name="kakunin" value="上記の内容で申込む" />
+  <input type="submit" name="kakunin" value="上記の内容で申込む Submit" />
 </form>
 <form action="./registration.rb" method="post" style="display: inline">
   #{reg_hidden_form}
-  <input type="submit" name="kakunin" value="修正する" />
+  <input type="submit" name="kakunin" value="修正する Modify" />
 </form>
 EOM
         

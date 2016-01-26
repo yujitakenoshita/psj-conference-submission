@@ -23,13 +23,9 @@ begin
   if cgi["call"] == 'confirm' then
     select = 'confirm'
     message = ""
-    if cgi["lname"] == ""
+    if cgi["name"] == ""
       select = 'error'
-      message = message + "姓が未入力です。Missing Last name.<br />"
-    end
-    if cgi["fname"] == ""
-      select = 'error'
-      message = message + "名が未入力です。 Missing First name.<br />"
+      message = message + "お名前が未入力です。Missing your name.<br />"
     end
     if cgi["affil"] == ""
       select = 'error'
@@ -61,9 +57,9 @@ begin
   
   # 発表種別を確認
   cat = {"oral" => "", "poster" => ""}
-  if cgi["cat"] == "口頭"
+  if cgi["cat"] == "口頭_Oral"
     cat["oral"] = "checked"
-  elsif cgi["cat"] == "ポスター"
+  elsif cgi["cat"] == "ポスター_Poster"
     cat["poster"] = "checked"
   end
   
@@ -84,8 +80,8 @@ begin
   
   # 入力・修正画面のエラーメッセージ
   con_error_messages =
-    "<p><span style='color: red'>入力内容に誤りがあります!</span> <br />\n" +
-    "ご記入いただいた内容を再確認してください。<br />\n" +
+    "<p><span style='color: red'>入力内容に不備があります! Invalid fieds(s)!</span> <br />\n" +
+    "ご記入いただいた内容を再確認してください。Check field(s).<br />\n" +
     "<span style='color: red'>#{message}</span></p>\n"
   
   
@@ -95,20 +91,14 @@ begin
 
      <h2>お名前 Name</h2>
       <table>
-	<tr><th>姓</th><th>名</th></tr>
-	<tr>
-	  <td><input type="text" name="lname" value="#{cgi["lname"]}" size="20"/></td>
-	  <td><input type="text" name="fname" value="#{cgi["fname"]}"  size="20" /></td>
-	</tr>
-	<tr>
-	  <td class="ex">ex) 西郷; Mozart</td><td class="ex">ex) 隆盛; Wolfgang A.</td>
-	</tr>
+	<tr><td><input type="text" name="name" value="#{cgi["name"]}" size="20"/></td></tr>
+	<tr><td class="ex">example) 西郷隆盛; Wolfgang A. Mozart</td></tr>
       </table>
       
       <h2>ご所属 Affiliation</h2>
       <table>
 	<tr><td><input type="text" name="affil" value="#{cgi["affil"]}" size="90" /></td></tr>
-	<tr><td class="ex">例) 鹿児島大・理; 京都大・霊長研 Faculty of Sciences, Kagoshima Univ.; Primate Research Institute, Kyoto Univ.</td></tr>
+	<tr><td class="ex">example) 鹿児島大・理; 京都大・霊長研 Fac. Sciences, Kagoshima Univ.; Primate Research Institute, Kyoto Univ.</td></tr>
       </table>
 
       <h2>電子メール E-Mail</h2>
@@ -119,8 +109,8 @@ begin
      <h2>発表種別 Category</h2>
 
      <table>
-     <tr><td><input type="radio" name="cat" value="口頭" #{cat["oral"]} />口頭 Oral
-	  <input type="radio" name="cat" value="ポスター"  #{cat["poster"]} />ポスター Poster</td></tr>
+     <tr><td><input type="radio" name="cat" value="口頭_Oral" #{cat["oral"]} />口頭 Oral
+	  <input type="radio" name="cat" value="ポスター_Poster"  #{cat["poster"]} />ポスター Poster</td></tr>
      </table>
  
      <h2>演題 Title</h2>
@@ -132,7 +122,7 @@ begin
      <span style="color: red; font-size: 80%">正式演題が英文であっても入力してください。 Please fill even if the original title is in English.</span></td></tr>
      </table>
 
-     <h2>発表者の人数 Number of co-authors</h2>
+     <h2>発表者の人数 Number of authors</h2>
      <table>
 	<tr><td><select name="co-author">
 	    <option value="0" #{coauthor[0]}>(選択してください please select)</option>
@@ -160,25 +150,24 @@ EOM
 
   # 確認画面のhtmlソース
   con_confirm = <<EOM
-  <h2>発表申込者、演題の確認</h2>
+  <h2>発表申込者、演題の確認 Confirm your entry</h2>
 
 <table>
-<tr><th>お名前</th><td>#{cgi["lname"]} #{cgi["fname"]}</td></tr>
-<tr><th>ご所属</th><td>#{cgi["affil"]}</td></tr>
-<tr><th>電子メール</th><td>#{cgi["email"]}</td></tr>
-<tr><th>発表種別</th><td>#{cgi["cat"]}</td></tr>
-<tr><th>演題</th><td>#{cgi["title"]}</td></tr>
-<tr><th>演題(欧文)</th><td>#{cgi["title-en"]}</td></tr>
-<tr><th>共同発表者数</th><td>#{cgi["co-author"]}人</td></tr>
-<tr><th>発表賞</th><td>#{cgi["award"]}</td></tr>
+<tr><th>お名前 Name</th><td>#{cgi["name"]}</td></tr>
+<tr><th>ご所属 Affiliation</th><td>#{cgi["affil"]}</td></tr>
+<tr><th>電子メール E-Mail</th><td>#{cgi["email"]}</td></tr>
+<tr><th>発表種別 Category</th><td>#{cgi["cat"]}</td></tr>
+<tr><th>演題 Original Title</th><td>#{cgi["title"]}</td></tr>
+<tr><th>演題(欧文) English Title</th><td>#{cgi["title-en"]}</td></tr>
+<tr><th>発表者数 Number of author(s)</th><td>#{cgi["co-author"]}人</td></tr>
+<tr><th>発表賞 Presentaion Award</th><td>#{cgi["award"]}</td></tr>
 </table>
 EOM
 
   
   # 確認画面の hidden フォーム
   con_hidden_form = <<EOM
-   <input type="hidden" name="lname" value="#{cgi["lname"]}" />
-   <input type="hidden" name="fname" value="#{cgi["fname"]}" />
+   <input type="hidden" name="name" value="#{cgi["name"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
    <input type="hidden" name="email" value="#{cgi["email"]}" />
    <input type="hidden" name="cat" value="#{cgi["cat"]}" />
@@ -192,11 +181,11 @@ EOM
   con_button = <<EOM
 <form action="./abstract.rb" method="post" style="display: inline">
   #{con_hidden_form}
-  <input type="submit" name="kakunin" value="要旨と共同発表者の入力に進む" />
+  <input type="submit" name="kakunin" value="要旨と共同発表者の入力に進む Proceed to abstract submission" />
 </form>
 <form action="./contribution.rb" method="post" style="display: inline">
   #{con_hidden_form}
-  <input type="submit" name="kakunin" value="修正する" />
+  <input type="submit" name="kakunin" value="修正する Modify field(s)" />
 </form>
 EOM
 

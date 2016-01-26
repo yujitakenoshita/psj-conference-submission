@@ -35,15 +35,15 @@ begin
     while enum <= cgi["co-author"].to_i do
       if cgi["author" + enum.to_s] == "" then
         select = 'error'
-        message = message + "<br />発表者情報に未入力の箇所があります。"
+        message = message + "<br />発表者情報に未入力の箇所があります。Missing author(s) field."
         break
       elsif cgi["author-en" + enum.to_s] == "" then
         select = 'error'
-        message = message + "<br />発表者情報に未入力の箇所があります。"
+        message = message + "<br />発表者情報に未入力の箇所があります。Missing author(s) field."
         break
       elsif cgi["affil" + enum.to_s] == "" then
         select = 'error'
-        message = message + "<br />発表者情報に未入力の箇所があります。"
+        message = message + "<br />発表者情報に未入力の箇所があります。。Missing author(s) field."
         break
       else
         enum = enum + 1
@@ -58,15 +58,14 @@ begin
 
   # 修正画面のエラーメッセージ
   abst_error_messages = 
-    "<p><span style='color: red'>入力内容に不備があります!</span> <br />\n" +
-    "ご記入いただいた内容を再確認してください。<br />\n" +
+    "<p><span style='color: red'>入力内容に不備があります! Invalid field(s)!</span> <br />\n" +
+    "ご記入いただいた内容を再確認してください。Check fields.<br />\n" +
     "<span style='color: red'>#{message}</span></p>\n"
 
   # 入力・修正画面のフォーム部分の部品
   # Contributionからの引き継ぎ内容
   authorinfo = <<EOM
-   <input type="hidden" name="lname" value="#{cgi["lname"]}" />
-   <input type="hidden" name="fname" value="#{cgi["fname"]}" />
+   <input type="hidden" name="name" value="#{cgi["name"]}" />
    <input type="hidden" name="affil" value="#{cgi["affil"]}" />
    <input type="hidden" name="email" value="#{cgi["email"]}" />
    <input type="hidden" name="cat" value="#{cgi["cat"]}" />
@@ -89,22 +88,22 @@ EOM
 EOM
   # 発表者情報の部分
   first_author = <<EOM
-    <h2>発表者</h2>
+    <h2>発表者 Author(s)</h2>
     <p span style="font-size: 90%">発表者の情報を以下に入力してください。<br />
-    和文のお名前は、姓と名のあいだに半角スペースを入れてください。(例) 西郷 隆盛<br />
-    欧文のお名前は、姓を先に、名をうしろに記してください。姓はすべて大文字にしてください。
+    和文のお名前は、姓と名のあいだにスペースを入れずに入力してください。(例) <br />
+    欧文のお名前は、名、姓の順に記してください。姓はすべて大文字にしてください。
     (例) MOZART Wolfgang A <br />
-    For English name, last name should be capitalized and placed first. (ex) MOZART Wolfgang A</p>
+    For English name, first name first. Last name should be capitalized. (ex) Wolfgang A. MOZART</p>
     <fieldset>
-      <legend>筆頭発表者</legend>
-      <p><span style="font-size: 60%">氏名 (和文/Japanese)</span>
-           <input type="text" name="author1" value="#{cgi["lname"]} #{cgi["fname"]}" size="25"> 
-           <span style="font-size: 60%">例) 西郷 隆盛; MOZART Worfgang A</span><br />
-           <span style="font-size: 60%;">　　　　 (欧文/English)</span>
+      <legend>筆頭発表者 First author</legend>
+      <p><span style="font-size: 60%">氏名 Name</span>
+           <input type="text" name="author1" value="#{cgi["name"]}" size="25"> 
+           <span style="font-size: 60%">例) 黒田清輝; Wolfgang A. MOZART</span><br />
+           <span style="font-size: 60%;">Name in English</span>
            <input type="text" name="author-en1" value="#{cgi["author-en1"]}" size="40">
-           <span style="font-size: 60%"> ex) SAIGO Takamori; MOZART Wolfgang A</span><br />
+           <span style="font-size: 60%"> ex) Seiki KURODA; Wolfgang A. MOZART</span><br />
            <span style="font-size: 60%; color: red">Please fill both Japanese and English fields.</span>
-      <p><span style="font-size: 60%">所属　　</span>
+      <p><span style="font-size: 60%">所属 Affiliation</span>
            <input type="text" name="affil1" value="#{cgi["affil"]}" size="60"></p>
      </fieldset>
 EOM
@@ -122,15 +121,15 @@ EOM
       vaffil = cgi["affil" + num.to_s]
       co_authors = co_authors +  <<EOM
       <fieldset>
-        <legend>第#{num}発表者</legend>
-        <p><span style="font-size: 60%;">氏名 (和文)</span>
+        <legend>第#{num}発表者 Author #{num}</legend>
+        <p><span style="font-size: 60%;">氏名 Name</span>
            <input type="text" name="author#{num}" value="#{vauthor}" size="20"/>
-           <span style="font-size: 60%">例) 大久保 利通; HAYDN Franz J</span><br />
-           <span style="font-size: 60%;">　　 (欧文)</span>
+           <span style="font-size: 60%">例) 中馬庚; Franz J. HAYDN</span><br />
+           <span style="font-size: 60%;">Name in English</span>
            <input type="text" name="author-en#{num}" value="#{vauthen}" size="40" />
-           <span style="font-size: 60%"> ex) OHKUBO Toshimichi; HAYDN Franz J</span><br />
+           <span style="font-size: 60%"> ex) CHUMAN Kanae; HAYDN Franz J</span><br />
            <span style="font-size: 60%; color: red">Please fill both Japanese and English fields.</span></p>
-        <p><span style="font-size: 60%">所属   　　</span>
+        <p><span style="font-size: 60%">所属 Affiliation</span>
            <input type="text" name="affil#{num}" value="#{vaffil}" size="60"></p>
      </fieldset>
 EOM
@@ -182,19 +181,19 @@ EOM
   end
 
   abst_confirm = <<EOM
-   <h1>発表申込：すべての内容の最終確認</h1>
-   <p>以下の内容でよろしいでしょうか。</p>
+   <h1>発表申込：申込み内容の確認 Confirmation</h1>
+   <p>以下の内容でよろしいでしょうか。Please confirm your entry.</p>
     <hr />
 
    <h2>演題 Title</h2>
      <table>
-       <tr><th>和文</th><td>#{cgi["title"]}</td></tr>
+       <tr><th>Original Title</th><td>#{cgi["title"]}</td></tr>
        <tr><th>English Title</th><td>#{cgi["title-en"]}</td></tr>
      </table>
    <h2>発表者 Author(s)</h2>
      <table>
-       <tr><th>和文</th><td>#{authors}</td></tr>
-       <tr><th>English</th><td>#{authorsEn}</td></tr>
+       <tr><th>発表者 Name(s)</th><td>#{authors}</td></tr>
+       <tr><th>English Name(s)</th><td>#{authorsEn}</td></tr>
      </table>
    <h2>要旨 Abstract</h2>
      <p>　#{abst_text}</p>
@@ -218,11 +217,11 @@ EOM
   abst_button = <<EOM
    <form action="./send-abstract.rb" method="post" style="display: inline">
       #{abst_hidden_form}
-      <input type="submit" name="kakunin" value="この内容で送信する" />
+      <input type="submit" name="kakunin" value="この内容で送信する Submit" />
    </form>
    <form action="./abstract.rb" method="post" style="display: inline">
       #{abst_hidden_form}
-      <input type="submit" name="kakunin" value="修正する" />
+      <input type="submit" name="kakunin" value="修正する Modify field(s)" />
    </form>
 EOM
   
